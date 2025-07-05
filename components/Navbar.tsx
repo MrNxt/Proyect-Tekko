@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { label } from "framer-motion/client";
 
 const sections = [
   { id: "inicio", label: "Inicio" },
   { id: "info", label: "Sobre Tekko" },
   { id: "visual-support", label: "Explora" },
-  { id: "sobre", label: "Lanzamiento" },
+  { id: "beta-signup", label: "Prueba" },
 ];
 
 const Navbar = () => {
@@ -133,7 +134,12 @@ const Navbar = () => {
                 className="block text-left hover:text-[#D74B16] transition-colors duration-200"
                 initial={{ opacity: 0, x: 20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24, delay: index * 0.1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 24,
+                  delay: index * 0.1,
+                }}
               >
                 {section.label}
               </motion.a>

@@ -15,10 +15,13 @@ export default function Footer() {
               height={40}
               className="object-contain"
             />
-            <span className="text-3xl font-extrabold text-[#FACC15]">TEKKO</span>
+            <span className="text-3xl font-extrabold text-[#FACC15]">
+              TEKKO
+            </span>
           </div>
           <p className="text-sm text-gray-300 text-center md:text-left max-w-xs">
-            ¡Creemos que la tecnología no tiene sentido si no se usa para el bien común, por eso creamos Tekko!
+            ¡Creemos que la tecnología no tiene sentido si no se usa para el
+            bien común, por eso creamos Tekko!
           </p>
         </div>
 
@@ -26,9 +29,30 @@ export default function Footer() {
         <div className="text-center md:text-left">
           <h2 className="text-lg font-bold mb-4 text-[#FACC15]">Explora</h2>
           <ul className="space-y-2 text-base">
-            <li><a href="https://www.yvagacore.tech/" className="hover:text-[#FACC15]">Sobre Nosotros</a></li>
-            <li><a href="https://www.yvagacore.tech/" className="hover:text-[#FACC15]">Apoyar</a></li>
-            <li><a href="mailto:business@yvagacore.tech" className="hover:text-[#FACC15]">Contacto</a></li>
+            <li>
+              <a
+                href="https://www.yvagacore.tech/"
+                className="hover:text-[#FACC15]"
+              >
+                Sobre Nosotros
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.yvagacore.tech/"
+                className="hover:text-[#FACC15]"
+              >
+                Apoyar
+              </a>
+            </li>
+            <li>
+              <a
+                href="mailto:business@yvagacore.tech"
+                className="hover:text-[#FACC15]"
+              >
+                Contacto
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -36,16 +60,23 @@ export default function Footer() {
         <div className="flex flex-col items-center md:items-end space-y-4">
           <h2 className="text-lg font-bold text-[#FACC15]">Síguenos</h2>
           <div className="flex space-x-5 text-3xl text-[#e4e9ea]">
-            <a href="https://www.instagram.com/tekko_app/"><FaInstagram className="hover:scale-110 transition-transform" /></a>
-            <a href="https://www.instagram.com/tekko_app/"><FaTiktok className="hover:scale-110 transition-transform" /></a>
-            <a href="https://www.instagram.com/tekko_app/"><FaLinkedinIn className="hover:scale-110 transition-transform" /></a>
+            <a href="https://www.instagram.com/tekko_app/">
+              <FaInstagram className="hover:scale-110 transition-transform" />
+            </a>
+            <a href="https://www.tiktok.com/@soy.tekko.app/">
+              <FaTiktok className="hover:scale-110 transition-transform" />
+            </a>
+            <a href="https://www.instagram.com/tekko_app/">
+              <FaLinkedinIn className="hover:scale-110 transition-transform" />
+            </a>
           </div>
         </div>
       </div>
 
       {/* Línea inferior */}
       <div className="max-w-6xl mx-auto mt-10 pt-6 border-t border-gray-700 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} YvagaCore | Tekko. Todos los derechos reservados.
+        © {new Date().getFullYear()} YvagaCore | Tekko. Todos los derechos
+        reservados.
       </div>
     </footer>
   );
