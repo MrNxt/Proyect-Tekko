@@ -1,16 +1,33 @@
-"use client";
 import Image from "next/image";
-import React, { useRef, useLayoutEffect, useState } from "react";
+import React, { useRef, useLayoutEffect, useState, useCallback } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
-const HeroDetailsDesktop = () => {
-  const [activeSection, setActiveSection] = useState(0);
-  const [isIndicatorsVisible, setIsIndicatorsVisible] = useState(false);
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+// Define section type for type safety
+interface Section {
+  id: string;
+  title: string;
+  description: string;
+  images: { src: string; alt: string }[];
+}
+
+// Type for GSAP Tween (from gsap types)
+type GSAPTween = ReturnType<typeof gsap.to>;
+
+// Use React.memo with typed props (empty in this case)
+const HeroDetailsDesktop = React.memo(() => {
+  const [activeSection, setActiveSection] = useState<number>(0);
+  const [isIndicatorsVisible, setIsIndicatorsVisible] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const panelsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const scrollTriggerRef = useRef<GSAPTween | null>(null);
+  const indicatorTriggerRef = useRef<ScrollTrigger | null>(null);
 
-  const sections = [
+  const sections: Section[] = [
     {
       id: "visual-support",
       title: "Apoyo visual y emocional",
@@ -46,107 +63,154 @@ const HeroDetailsDesktop = () => {
     },
   ];
 
+  // Debounce function with proper typing
+  const debounce = <T extends (...args: any[]) => void>(
+    func: T,
+    wait: number
+  ) => {
+    let timeout: NodeJS.Timeout | null = null;
+    return (...args: Parameters<T>) => {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  // Handle section change with debouncing
+  const handleSectionChange = useCallback(
+    debounce((idx: number) => {
+      setActiveSection(idx);
+    }, 100),
+    []
+  );
+
   useLayoutEffect(() => {
     if (typeof window !== "undefined" && containerRef.current) {
-      gsap.registerPlugin(ScrollTrigger);
+      const panels = panelsRef.current.filter(Boolean); // Remove null refs
+      const container = containerRef.current;
 
-      const handle = setTimeout(() => {
-        ScrollTrigger.getAll().forEach((st) => st.kill());
+      // Optimize container for GPU acceleration
+      container.style.willChange = "transform";
+      container.style.transform = "translate3d(0,0,0)";
 
-        const panels = panelsRef.current;
+      const activeRef = { current: -1 };
 
-        const scrollTween = gsap.to(panels, {
-          xPercent: -100 * (panels.length - 1),
-          ease: "none",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            pin: true,
-            scrub: 1,
-            snap: {
-              snapTo: 1 / (panels.length - 1),
-              duration: { min: 0.2, max: 0.8 },
-              delay: 0.1,
-            },
-            start: "top top",
-            end: () => "+=" + (containerRef.current?.offsetWidth ?? 0),
-            onUpdate: (self) => {
-              const newActiveSection = Math.round(
-                self.progress * (panels.length - 1)
-              );
-              setActiveSection(newActiveSection);
-            },
+      // Create ScrollTrigger
+      scrollTriggerRef.current = gsap.to(panels, {
+        xPercent: -100 * (panels.length - 1),
+        ease: "none",
+        scrollTrigger: {
+          trigger: container,
+          pin: true,
+          scrub: 1,
+          snap: {
+            snapTo: (progress) =>
+              Math.round(progress * (panels.length - 1)) / (panels.length - 1),
+            duration: 0.25,
+            ease: "power2.out",
           },
-        });
-
-        const indicatorTrigger = ScrollTrigger.create({
-          trigger: containerRef.current,
           start: "top top",
-          end: () => "+=" + (containerRef.current?.offsetWidth ?? 0),
-          onToggle: (self) => {
-            const indicators = document.getElementById("hero-indicators");
-            if (indicators) {
-              gsap.to(indicators, {
-                opacity: self.isActive ? 1 : 0,
-                y: self.isActive ? 0 : 50,
-                pointerEvents: self.isActive ? "auto" : "none",
-                duration: 0.5,
-                ease: self.isActive ? "power2.out" : "power2.in",
-              });
-              setIsIndicatorsVisible(self.isActive);
+          end: () => "+=" + (container.scrollWidth - container.clientWidth),
+          fastScrollEnd: true,
+          onUpdate: (self: ScrollTrigger) => {
+            const idx = Math.round(self.progress * (panels.length - 1));
+            if (idx !== activeRef.current) {
+              activeRef.current = idx;
+              handleSectionChange(idx);
             }
           },
-        });
+        },
+      });
 
-        return () => {
-          scrollTween.kill();
-          indicatorTrigger.kill();
-          ScrollTrigger.getAll().forEach((st) => st.kill());
-        };
-      }, 250); // delay hasta que layout esté completo
+      // Indicator animation
+      indicatorTriggerRef.current = ScrollTrigger.create({
+        trigger: container,
+        start: "top top",
+        end: () => "+=" + (container.scrollWidth - container.clientWidth),
+        onToggle: (self: ScrollTrigger) => {
+          const indicators = document.getElementById("hero-indicators");
+          if (indicators) {
+            gsap.to(indicators, {
+              opacity: self.isActive ? 1 : 0,
+              y: self.isActive ? 0 : 50,
+              pointerEvents: self.isActive ? "auto" : "none",
+              duration: 0.25,
+              ease: "power2.out",
+            });
+            setIsIndicatorsVisible(self.isActive);
+          }
+        },
+      });
 
-      return () => clearTimeout(handle);
+      return () => {
+        // Clean up only this component's ScrollTriggers
+        if (scrollTriggerRef.current) scrollTriggerRef.current.kill();
+        if (indicatorTriggerRef.current) indicatorTriggerRef.current.kill();
+        container.style.willChange = "";
+        container.style.transform = "";
+      };
     }
-  }, [sections.length]);
+  }, [sections.length, handleSectionChange]);
 
   const goToSection = (index: number) => {
-    const totalSections = sections.length;
-    const scrollProgress = index / (totalSections - 1);
+    if (!containerRef.current || !scrollTriggerRef.current) return;
 
-    const st = ScrollTrigger.getAll().find(
-      (st) => st.trigger === containerRef.current
-    );
+    // Pause ScrollTrigger to avoid conflicts
+    scrollTriggerRef.current.scrollTrigger?.disable();
 
-    if (st) {
-      const newScrollPosition = st.start + (st.end - st.start) * scrollProgress;
-      window.scrollTo({
-        top: newScrollPosition,
-        behavior: "smooth",
-      });
-    }
+    gsap.to(window, {
+      scrollTo: {
+        y: containerRef.current,
+        offsetY: (containerRef.current.scrollWidth / sections.length) * index,
+      },
+      duration: 0.6,
+      ease: "power2.inOut",
+      onComplete: () => {
+        // Re-enable ScrollTrigger
+        scrollTriggerRef.current?.scrollTrigger?.enable();
+      },
+    });
   };
 
   return (
     <div className="hero-details relative overflow-hidden">
-      {/* Elementos decorativos */}
+      {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Top right */}
-        <div className="absolute top-20 right-32 w-16 h-16 bg-orange-500 rounded-full opacity-80 shadow-lg"></div>
-
-        {/* Elementos verdes */}
-        <div className="absolute top-16 right-16 w-4 h-4 bg-green-500 rounded-full"></div>
-        <div className="absolute bottom-32 left-8 w-6 h-6 bg-green-500 rounded-full"></div>
-
-        {/* Elementos naranjas/rojos */}
-        <div className="absolute top-1/3 right-8 w-3 h-3 bg-orange-500 rounded-full"></div>
-        <div className="absolute bottom-40 right-20 w-5 h-5 bg-red-500 rounded-full"></div>
-
-        {/* Elementos púrpura/azul */}
-        <div className="absolute top-1/2 left-8 w-4 h-4 bg-purple-500 rounded-full"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-blue-500 rounded-full"></div>
-
-        {/* Formas hexagonales grises */}
-        <div className="absolute top-1/4 left-16 w-8 h-8 bg-gray-600 opacity-30 transform rotate-45"></div>
-        <div className="absolute bottom-20 right-1/4 w-6 h-6 bg-gray-600 opacity-30 transform rotate-12"></div>
+        <div
+          className="absolute top-20 right-32 w-16 h-16 bg-orange-500 rounded-full opacity-80 shadow-lg"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute top-16 right-16 w-4 h-4 bg-green-500 rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-8 w-6 h-6 bg-green-500 rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute top-1/3 right-8 w-3 h-3 bg-orange-500 rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute bottom-40 right-20 w-5 h-5 bg-red-500 rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-8 w-4 h-4 bg-purple-500 rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-blue-500 rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute top-1/4 left-16 w-8 h-8 bg-gray-600 opacity-30 transform rotate-45"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
+        <div
+          className="absolute bottom-20 right-1/4 w-6 h-6 bg-gray-600 opacity-30 transform rotate-12"
+          style={{ willChange: "transform, opacity" }}
+        ></div>
       </div>
 
       <div ref={containerRef} className="h-screen overflow-hidden relative">
@@ -159,7 +223,6 @@ const HeroDetailsDesktop = () => {
               className="w-screen h-full flex-shrink-0 flex items-center justify-center px-8"
             >
               <div className="max-w-6xl mx-auto w-full grid grid-cols-2 gap-16 items-center h-full">
-                {/* Contenido de texto */}
                 <div className="space-y-8 relative z-10">
                   <div className="space-y-6">
                     <p className="text-gray-400 text-sm font-semibold tracking-wider uppercase">
@@ -188,9 +251,8 @@ const HeroDetailsDesktop = () => {
                   </div>
                 </div>
 
-                {/* Sección de imágenes */}
                 <div className="relative w-full h-full flex items-center justify-center">
-                  {/* Móvil principal */}
+                  {/* Primary mobile */}
                   <div className="relative z-20">
                     <div className="rounded-3xl">
                       <div className="rounded-3xl p-3">
@@ -200,14 +262,15 @@ const HeroDetailsDesktop = () => {
                             alt={section.images[0].alt}
                             fill
                             className="object-contain"
-                            quality={100}
+                            quality={70}
+                            priority={index === 0}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Móvil secundario derecho */}
+                  {/* Secondary mobile (right) */}
                   <div className="absolute right-8 top-16 z-10">
                     <div className="rounded-2xl p-2">
                       <div className="relative h-[320px] w-[180px] rounded-xl overflow-hidden">
@@ -216,13 +279,14 @@ const HeroDetailsDesktop = () => {
                           alt={section.images[1].alt}
                           fill
                           className="object-contain"
-                          quality={90}
+                          quality={50}
+                          loading="lazy"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Móvil secundario inferior */}
+                  {/* Secondary mobile (bottom) */}
                   <div className="absolute bottom-20 right-16 z-15">
                     <div className="rounded-2xl p-2">
                       <div className="relative h-[180px] w-[100px] rounded-xl overflow-hidden">
@@ -231,7 +295,8 @@ const HeroDetailsDesktop = () => {
                           alt={section.images[2].alt}
                           fill
                           className="object-contain"
-                          quality={90}
+                          quality={50}
+                          loading="lazy"
                         />
                       </div>
                     </div>
@@ -244,6 +309,6 @@ const HeroDetailsDesktop = () => {
       </div>
     </div>
   );
-};
+});
 
 export default HeroDetailsDesktop;

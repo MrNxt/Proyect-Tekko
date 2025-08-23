@@ -1,0 +1,32 @@
+[33mcommit e8ce84310f2aacb833ba432a3e1ed36947b2343b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: tobias-tj <https.tobias.jara.404@gmail.com>
+Date:   Sun Jul 20 12:56:19 2025 -0300
+
+    Se agrega el boton para redirigir a nuestra beta cerrada
+
+[33mcommit 886d1ae34f7e82a01289cd086beae9b49451520c[m
+Merge: b94103e 1f8caf8
+Author: Tobias <123388078+tobias-tj@users.noreply.github.com>
+Date:   Sat Jul 5 16:38:41 2025 -0300
+
+    Merge pull request #1 from MrNxt/feature/mail-form
+    
+    Se agrega el flujo para enviar el formulario de solicitud de  prueba …
+
+[33mcommit 1f8caf8f31bf55304073f0e8cdb45e3bb9a0bdc3[m[33m ([m[1;31morigin/feature/mail-form[m[33m, [m[1;32mfeature/mail-form[m[33m)[m
+Author: tobias-tj <https.tobias.jara.404@gmail.com>
+Date:   Fri Jul 4 09:47:12 2025 -0300
+
+    Se agrega el flujo para enviar el formulario de solicitud de  prueba de app
+
+[33mcommit b94103e8ca42eecf1805bc4aecdddb390b8ec1fe[m
+Author: tjara1 <tjara@excelsis.com.py>
+Date:   Tue May 20 00:35:27 2025 -0300
+
+    Modo Product
+
+[33mcommit 9975b9ef04a122c23c362445e2fc815e355296d4[m
+Author: MrNxt <alejrprieto@outlook.com>
+Date:   Mon May 19 22:12:32 2025 -0300
+
+    Se lanza la primera versión de la web de Tekko
