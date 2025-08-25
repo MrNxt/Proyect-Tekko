@@ -1,13 +1,12 @@
 import Image from "next/image";
-import React, { useRef, useLayoutEffect, useState, useCallback } from "react";
+import React, { useRef, useLayoutEffect, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
-// Register GSAP plugins
+// GSAP
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-// Define section type for type safety
 interface Section {
   id: string;
   title: string;
@@ -15,16 +14,23 @@ interface Section {
   images: { src: string; alt: string }[];
 }
 
-// Type for GSAP Tween (from gsap types)
+// Type for GSAP Tween 
 type GSAPTween = ReturnType<typeof gsap.to>;
 
-// Use React.memo with typed props (empty in this case)
-const HeroDetailsDesktop = React.memo(() => {
+const debounce = <T extends (...args: any[]) => void>(func: T, wait: number) => {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+const HeroDetailsDesktopComponent = () => {
   const [activeSection, setActiveSection] = useState<number>(0);
   const [isIndicatorsVisible, setIsIndicatorsVisible] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const panelsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const scrollTriggerRef = useRef<GSAPTween | null>(null);
+  const scrollTweenRef = useRef<GSAPTween | null>(null);
   const indicatorTriggerRef = useRef<ScrollTrigger | null>(null);
 
   const sections: Section[] = [
@@ -63,154 +69,119 @@ const HeroDetailsDesktop = React.memo(() => {
     },
   ];
 
-  // Debounce function with proper typing
-  const debounce = <T extends (...args: any[]) => void>(
-    func: T,
-    wait: number
-  ) => {
-    let timeout: NodeJS.Timeout | null = null;
-    return (...args: Parameters<T>) => {
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  };
-
-  // Handle section change with debouncing
-  const handleSectionChange = useCallback(
-    debounce((idx: number) => {
-      setActiveSection(idx);
-    }, 100),
+  // Debounced, no cambia entre renders
+  const handleSectionChange = useMemo(
+    () =>
+      debounce((idx: number) => {
+        setActiveSection(idx);
+      }, 100),
     []
   );
 
   useLayoutEffect(() => {
-    if (typeof window !== "undefined" && containerRef.current) {
-      const panels = panelsRef.current.filter(Boolean); // Remove null refs
-      const container = containerRef.current;
+    if (!containerRef.current) return;
 
-      // Optimize container for GPU acceleration
-      container.style.willChange = "transform";
-      container.style.transform = "translate3d(0,0,0)";
+    const container = containerRef.current;
+    const panels = panelsRef.current.filter(Boolean) as HTMLDivElement[];
 
-      const activeRef = { current: -1 };
+    // GPU
+    container.style.willChange = "transform";
+    container.style.transform = "translate3d(0,0,0)";
 
-      // Create ScrollTrigger
-      scrollTriggerRef.current = gsap.to(panels, {
-        xPercent: -100 * (panels.length - 1),
-        ease: "none",
-        scrollTrigger: {
-          trigger: container,
-          pin: true,
-          scrub: 1,
-          snap: {
-            snapTo: (progress) =>
-              Math.round(progress * (panels.length - 1)) / (panels.length - 1),
-            duration: 0.25,
-            ease: "power2.out",
-          },
-          start: "top top",
-          end: () => "+=" + (container.scrollWidth - container.clientWidth),
-          fastScrollEnd: true,
-          onUpdate: (self: ScrollTrigger) => {
-            const idx = Math.round(self.progress * (panels.length - 1));
-            if (idx !== activeRef.current) {
-              activeRef.current = idx;
-              handleSectionChange(idx);
-            }
-          },
-        },
-      });
+    const activeRef = { current: -1 };
 
-      // Indicator animation
-      indicatorTriggerRef.current = ScrollTrigger.create({
+    // Calcula la longitud de scroll: ancho de viewport * (paneles - 1)
+    const getEnd = () => container.offsetWidth * Math.max(panels.length - 1, 0);
+
+    // ScrollTrigger principal
+    scrollTweenRef.current = gsap.to(panels, {
+      xPercent: -100 * (panels.length - 1),
+      ease: "none",
+      scrollTrigger: {
         trigger: container,
+        pin: true,
+        scrub: 1,
         start: "top top",
-        end: () => "+=" + (container.scrollWidth - container.clientWidth),
-        onToggle: (self: ScrollTrigger) => {
-          const indicators = document.getElementById("hero-indicators");
-          if (indicators) {
-            gsap.to(indicators, {
-              opacity: self.isActive ? 1 : 0,
-              y: self.isActive ? 0 : 50,
-              pointerEvents: self.isActive ? "auto" : "none",
-              duration: 0.25,
-              ease: "power2.out",
-            });
-            setIsIndicatorsVisible(self.isActive);
+        end: () => "+=" + getEnd(),
+        snap: {
+          snapTo: (progress) =>
+            Math.round(progress * (panels.length - 1)) / Math.max(panels.length - 1, 1),
+          duration: 0.25,
+          ease: "power2.out",
+        },
+        onUpdate: (self: ScrollTrigger) => {
+          const idx = Math.round(self.progress * (panels.length - 1));
+          if (idx !== activeRef.current) {
+            activeRef.current = idx;
+            handleSectionChange(idx);
           }
         },
-      });
+      },
+    });
 
-      return () => {
-        // Clean up only this component's ScrollTriggers
-        if (scrollTriggerRef.current) scrollTriggerRef.current.kill();
-        if (indicatorTriggerRef.current) indicatorTriggerRef.current.kill();
-        container.style.willChange = "";
-        container.style.transform = "";
-      };
-    }
+    // Trigger para indicadores
+    indicatorTriggerRef.current = ScrollTrigger.create({
+      trigger: container,
+      start: "top top",
+      end: () => "+=" + getEnd(),
+      onToggle: (self) => {
+        const indicators = document.getElementById("hero-indicators");
+        if (!indicators) return;
+        gsap.to(indicators, {
+          opacity: self.isActive ? 1 : 0,
+          y: self.isActive ? 0 : 50,
+          pointerEvents: self.isActive ? "auto" : "none",
+          duration: 0.25,
+          ease: "power2.out",
+        });
+        setIsIndicatorsVisible(self.isActive);
+      },
+    });
+
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+
+    return () => {
+      scrollTweenRef.current?.kill();
+      indicatorTriggerRef.current?.kill();
+      container.style.willChange = "";
+      container.style.transform = "";
+    };
   }, [sections.length, handleSectionChange]);
 
   const goToSection = (index: number) => {
-    if (!containerRef.current || !scrollTriggerRef.current) return;
+    const container = containerRef.current;
+    const tween = scrollTweenRef.current;
+    if (!container || !tween) return;
 
-    // Pause ScrollTrigger to avoid conflicts
-    scrollTriggerRef.current.scrollTrigger?.disable();
+    tween.scrollTrigger?.disable();
+
+    const containerStart =
+      container.getBoundingClientRect().top + window.pageYOffset;
+    const targetY = containerStart + index * container.offsetWidth;
 
     gsap.to(window, {
-      scrollTo: {
-        y: containerRef.current,
-        offsetY: (containerRef.current.scrollWidth / sections.length) * index,
-      },
+      scrollTo: targetY,
       duration: 0.6,
       ease: "power2.inOut",
       onComplete: () => {
-        // Re-enable ScrollTrigger
-        scrollTriggerRef.current?.scrollTrigger?.enable();
+        tween.scrollTrigger?.enable();
       },
     });
   };
 
   return (
     <div className="hero-details relative overflow-hidden">
-      {/* Decorative elements */}
+      {/* Elementos Decorativos */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute top-20 right-32 w-16 h-16 bg-orange-500 rounded-full opacity-80 shadow-lg"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute top-16 right-16 w-4 h-4 bg-green-500 rounded-full"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute bottom-32 left-8 w-6 h-6 bg-green-500 rounded-full"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute top-1/3 right-8 w-3 h-3 bg-orange-500 rounded-full"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute bottom-40 right-20 w-5 h-5 bg-red-500 rounded-full"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute top-1/2 left-8 w-4 h-4 bg-purple-500 rounded-full"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-blue-500 rounded-full"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute top-1/4 left-16 w-8 h-8 bg-gray-600 opacity-30 transform rotate-45"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
-        <div
-          className="absolute bottom-20 right-1/4 w-6 h-6 bg-gray-600 opacity-30 transform rotate-12"
-          style={{ willChange: "transform, opacity" }}
-        ></div>
+        <div className="absolute top-20 right-32 w-16 h-16 bg-orange-500 rounded-full opacity-80 shadow-lg" />
+        <div className="absolute top-16 right-16 w-4 h-4 bg-green-500 rounded-full" />
+        <div className="absolute bottom-32 left-8 w-6 h-6 bg-green-500 rounded-full" />
+        <div className="absolute top-1/3 right-8 w-3 h-3 bg-orange-500 rounded-full" />
+        <div className="absolute bottom-40 right-20 w-5 h-5 bg-red-500 rounded-full" />
+        <div className="absolute top-1/2 left-8 w-4 h-4 bg-purple-500 rounded-full" />
+        <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-blue-500 rounded-full" />
+        <div className="absolute top-1/4 left-16 w-8 h-8 bg-gray-600 opacity-30 rotate-45" />
+        <div className="absolute bottom-20 right-1/4 w-6 h-6 bg-gray-600 opacity-30 rotate-12" />
       </div>
 
       <div ref={containerRef} className="h-screen overflow-hidden relative">
@@ -235,9 +206,7 @@ const HeroDetailsDesktop = React.memo(() => {
                         {section.title.split(" ").slice(1).join(" ")} para
                       </span>
                       <br />
-                      <span className="text-5xl xl:text-6xl font-bold">
-                        todos.
-                      </span>
+                      <span className="text-5xl xl:text-6xl font-bold">todos.</span>
                     </h1>
                     <p className="text-gray-400 text-lg leading-relaxed max-w-md">
                       {section.description}
@@ -245,7 +214,10 @@ const HeroDetailsDesktop = React.memo(() => {
                   </div>
 
                   <div className="flex gap-4 pt-2">
-                    <button className="border border-gray-600 text-white font-semibold px-8 py-4 rounded-lg hover:bg-gray-800 transition-all duration-300">
+                    <button
+                      className="border border-gray-600 text-white font-semibold px-8 py-4 rounded-lg hover:bg-gray-800 transition-all duration-300"
+                      onClick={() => goToSection((activeSection + 1) % sections.length)}
+                    >
                       Próximamente
                     </button>
                   </div>
@@ -287,7 +259,7 @@ const HeroDetailsDesktop = React.memo(() => {
                   </div>
 
                   {/* Secondary mobile (bottom) */}
-                  <div className="absolute bottom-20 right-16 z-15">
+                  <div className="absolute bottom-20 right-16" style={{ zIndex: 15 }}>
                     <div className="rounded-2xl p-2">
                       <div className="relative h-[180px] w-[100px] rounded-xl overflow-hidden">
                         <Image
@@ -309,6 +281,7 @@ const HeroDetailsDesktop = React.memo(() => {
       </div>
     </div>
   );
-});
+};
 
+const HeroDetailsDesktop = React.memo(HeroDetailsDesktopComponent);
 export default HeroDetailsDesktop;
