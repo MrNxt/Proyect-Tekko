@@ -10,6 +10,7 @@ const sections = [
   { id: "info", label: "Sobre Tekko" },
   { id: "visual-support", label: "Explora" },
   { id: "beta-signup", label: "Sugerencias" },
+  { id: "privacy-policy", label: "Política de Privacidad" },
 ];
 
 const Navbar = () => {
