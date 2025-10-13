@@ -142,9 +142,10 @@ const Info = () => {
 
           <FadeIn>
             <p className="text-gray-300 text-base sm:text-lg max-w-xl">
-              Tekko nace del deseo de transformar la manera en que las familias viven el autismo. 
-              Sabemos que cada niño es único, por eso nuestra app está diseñada con flexibilidad, empatía y ciencia. 
-              Trabajamos con psicólogos clínicos y expertos en neurodiversidad para ofrecer una herramienta útil, segura y transformadora
+              Somos un equipo de jóvenes con ganas de hacer un cambio real en la sociedad, desde lo que sabemos 
+              hacer. Tekko nace del deseo sincero de ayudar a las familias y acompañar a los niños que 
+              tienen dificultades de comunicación o aprendizaje. Lo hicimos desde el corazón, con la idea de crear algo
+              útil, accesible y seguro para todos. Por eso, nuestra app es totalmente gratuita.
             </p>
           </FadeIn>
 

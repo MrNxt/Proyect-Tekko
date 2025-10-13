@@ -9,7 +9,7 @@ const sections = [
   { id: "inicio", label: "Inicio" },
   { id: "info", label: "Sobre Tekko" },
   { id: "visual-support", label: "Explora" },
-  { id: "beta-signup", label: "Prueba" },
+  { id: "beta-signup", label: "Sugerencias" },
 ];
 
 const Navbar = () => {

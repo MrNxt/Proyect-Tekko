@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import Image from "next/image";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
@@ -24,39 +24,10 @@ const HeroBody = () => {
     },
   }), []);
 
-  const [timeLeft, setTimeLeft] = useState({
-    days: 30,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  const charactersRef = useRef(null);
-
-  useEffect(() => {
-    const launchDate = new Date("2025-11-01T00:00:00");
-
-    const updateCountdown = () => {
-      const now = new Date();
-      const diff = launchDate.getTime() - now.getTime();
-
-      setTimeLeft({
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000),
-      });
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white px-6 pt-36 pb-20 overflow-hidden bg-[#2e1f16]"
+      className="relative min-h-screen flex items-center justify-center text-white px-6 py-20 overflow-hidden bg-gradient-to-br from-[#2e1f16] via-[#3d2a1f] to-[#2e1f16]"
     >
       {/* Fondo de partículas */}
       <Particles id="tsparticles" init={particlesInit} options={particlesOptions} className="absolute inset-0 z-0" />
@@ -64,120 +35,140 @@ const HeroBody = () => {
       {/* Luces difusas */}
       <div className="absolute -top-32 left-[-15%] w-[500px] h-[500px] bg-yellow-500 opacity-30 rounded-full blur-3xl z-0 animate-pulse-slow" />
       <div className="absolute bottom-0 right-[-10%] w-[400px] h-[400px] bg-orange-400 opacity-20 rounded-full blur-3xl z-0 animate-pulse-medium" />
-      <div className="absolute top-1/2 right-[20%] w-[300px] h-[300px] bg-red-500 opacity-20 rounded-full blur-3xl z-0 animate-pulse-fast" />
+      <div className="absolute top-1/2 left-[10%] w-[300px] h-[300px] bg-yellow-500 opacity-15 rounded-full blur-3xl z-0 animate-pulse-fast" />
 
-      {/* Contenido principal */}
-      <div className="text-center max-w-2xl z-10 mb-8 mx-auto">
-        <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="text-5xl md:text-6xl font-extrabold leading-tight">
-          Hola, Soy <span className="text-yellow-400">Tekko</span>
-        </motion.h1>
+      {/* Contenedor principal */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+        
+        {/* Columna izquierda - Contenido de texto */}
+        <motion.div 
+          initial={{ opacity: 0, x: -50 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ duration: 1 }}
+          className="text-left space-y-6"
+        >
+          {/* Título principal */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-center md:text-left">
+            Aprendemos <span className="text-yellow-400"> y Crecemos</span> juntos
+          </h1>
 
-        <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5 }} className="mt-5 text-lg text-gray-300">
-          Tekko es una app diseñada para ayudar a niños con autismo, fortaleciendo el vínculo entre padres e hijos mediante actividades guiadas por especialistas
-        </motion.p>
+          {/* Descripción */}
+          <p className="text-lg md:text-xl text-gray-300 max-w-xl text-center md:text-left">
+            Tekko es una app diseñada para apoyar a niños con dificultades de comunicación, fortaleciendo el vínculo entre padres e hijos mediante actividades guiadas y adaptadas por especialistas
+          </p>
 
-        {/* Boton para ir al formulario de google */}
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 1 }} className="mt-8 z-20">
-          <a href="https://forms.gle/N8sYmJn2vWXzhM6Q8" target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-lg sm:text-xl shadow-lg hover:shadow-yellow-500/50 transition-all duration-300">
-            🚀 Reservá tu lugar en la beta cerrada
-          </a>
+          {/* Botones de descarga */}
+          <div className="flex flex-col items-center sm:flex-row sm:justify-start gap-4 pt-4">
+            {/* Botón Play Store */}
+            <motion.a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="group flex items-center gap-3 px-6 py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full font-bold text-lg shadow-xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 w-fit"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-6 h-6" fill="currentColor">
+                <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.6 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+              </svg>
+              <span>Descargar</span>
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </motion.a>
+
+            {/* Botón App Store - Próximamente */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex items-center gap-3 px-6 py-4 bg-black/40 border-2 border-yellow-500/40 text-white rounded-full font-semibold text-lg backdrop-blur-sm cursor-not-allowed w-fit"
+            >
+              <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              <span className="text-gray-400">Próximamente</span>
+            </motion.div>
+          </div>
+
         </motion.div>
-      </div>
 
-      {/* Contenedor de personajes */}
-      <div ref={charactersRef} className="relative w-full max-w-6xl h-[500px] mb-12">
-        {/* Personaje principal */}
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-auto md:h-auto">
-          <div className="hidden md:block absolute -left-6 -right-6 -top-12 bottom-20 bg-black/30 border-2 border-yellow-500/30 rounded-2xl shadow-xl shadow-yellow-500/20 backdrop-blur-sm overflow-hidden"></div>
-          <div className="animate-float-left">
-            <Image src="/tekko99.png" alt="Mascota Tekko" width={350} height={350} className="object-contain relative z-10 translate-y-6 transition-transform md:hover:scale-[1.35] duration-300 md:scale-125 scale-[1.6]" />
+        {/* Columna derecha - Tarjetas flotantes */}
+        <motion.div 
+          initial={{ opacity: 0, x: 50 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ duration: 1, delay: 0.2 }}
+          className="relative flex items-center justify-center lg:justify-end px-4 sm:px-0"
+        >
+          {/* Contenedor mobiles */}
+          <div className="relative w-[280px] h-[560px] sm:w-[320px] sm:h-[640px] lg:w-[360px] lg:h-[720px]">
+            
+            {/* Img */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-[220px] h-[440px] sm:w-[260px] sm:h-[520px]">
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Image 
+                  src="/img_1.png" 
+                  alt="Tekko App Interface" 
+                  width={260} 
+                  height={520}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Img 4 - Izquierda superior */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="hidden sm:block absolute -left-16 top-8 w-36 h-auto z-10"
+            >
+              <Image 
+                src="/img_4.png" 
+                alt="Tekko Screen" 
+                width={140} 
+                height={280}
+                className="w-full h-auto object-contain drop-shadow-2xl"
+              />
+            </motion.div>
+
+            {/* Img 5 - Derecha inferior */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              className="hidden sm:block absolute -right-16 bottom-20 w-32 h-auto z-10"
+            >
+              <Image 
+                src="/img_5.png" 
+                alt="Tekko Screen" 
+                width={128} 
+                height={256}
+                className="w-full h-auto object-contain drop-shadow-2xl"
+              />
+            </motion.div>
+
+            {/* Tarjetas flotantes */}
+            <motion.div className="absolute right-0 sm:-right-4 top-4 w-32 h-24 z-30 animate-float-right">
+              <div className="w-full h-full rounded-xl shadow-2xl overflow-hidden border-2 border-yellow-500/30 bg-gradient-to-br from-orange-600 to-yellow-600 p-2">
+                <Image src="/tekko4.png" alt="Personaje Tekko" width={120} height={90} className="w-full h-full object-contain"/>
+              </div>
+            </motion.div>
+
+            <motion.div className="absolute left-0 sm:-left-6 bottom-16 w-32 h-24 z-30 animate-float-left">
+              <div className="w-full h-full rounded-xl shadow-2xl overflow-hidden border-2 border-yellow-500/30 bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 p-2">
+                <Image src="/tekko3.png" alt="Personaje Tekko" width={120} height={90} className="w-full h-full object-contain"/>
+              </div>
+            </motion.div>
+
+            {/* Elementos decorativos flotantes */}
+            <motion.div animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-4 right-12 w-12 h-12 bg-yellow-400 rounded-full opacity-80 blur-sm z-5"/>
+            <motion.div animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute bottom-12 left-0 sm:-left-6 w-16 h-16 bg-orange-400 rounded-full opacity-60 blur-sm z-5"/>
+            <motion.div animate={{ y: [0, -15, 0], scale: [1, 1.1, 1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute top-1/3 right-0 sm:-right-4 w-8 h-8 bg-yellow-500 rounded-full opacity-70 blur-sm z-5"/>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Personaje izquierda */}
-        <div className="absolute bottom-0 left-[5%] z-10 hidden md:block">
-          <div className="absolute -left-4 -right-4 -top-8 bottom-10 bg-black/30 border-2 border-yellow-500/30 rounded-2xl shadow-xl shadow-yellow-500/20 backdrop-blur-sm overflow-hidden"></div>
-          <div className="animate-float-left">
-            <Image src="/tekko4.png" alt="Personaje izquierda" width={220} height={220} className="object-contain relative z-10 scale-110 translate-y-3 transition-transform hover:scale-125 duration-300" />
-          </div>
-        </div>
-
-        {/* Personaje derecha */}
-        <div className="absolute bottom-0 right-[5%] z-10 hidden md:block">
-          <div className="absolute -left-4 -right-4 -top-8 bottom-10 bg-black/30 border-2 border-yellow-500/30 rounded-2xl shadow-xl shadow-yellow-500/20 backdrop-blur-sm overflow-hidden"></div>
-          <div className="animate-float-right">
-            <Image src="/tekko3.png" alt="Personaje derecha" width={220} height={220} className="object-contain relative z-10 scale-110 translate-y-3 transition-transform hover:scale-125 duration-300" />
-          </div>
-        </div>
-      </div>
-
-      {/* Cuenta regresiva */}
-      <div className="flex justify-center items-center gap-4 z-20 mb-8 flex-wrap">
-        {/* DÍAS */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex flex-col items-center justify-center bg-black/40 border-2 border-yellow-500/30 rounded-xl backdrop-blur-sm hover:border-yellow-500/70 hover:scale-105 transition-all duration-300">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold">{timeLeft.days < 10 ? `0${timeLeft.days}` : timeLeft.days}</div>
-          <div className="text-xs text-gray-400">DÍAS</div>
-        </div>
-
-        {/* HORAS */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex flex-col items-center justify-center bg-black/40 border-2 border-yellow-500/30 rounded-xl backdrop-blur-sm hover:border-yellow-500/70 hover:scale-105 transition-all duration-300">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold">{timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}</div>
-          <div className="text-xs text-gray-400">HORAS</div>
-        </div>
-
-        {/* MINUTOS */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex flex-col items-center justify-center bg-black/40 border-2 border-yellow-500/30 rounded-xl backdrop-blur-sm hover:border-yellow-500/70 hover:scale-105 transition-all duration-300">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold">{timeLeft.minutes < 10 ? `0${timeLeft.minutes}` : timeLeft.minutes}</div>
-          <div className="text-xs text-gray-400">
-            <span className="block sm:hidden">MIN</span>
-            <span className="hidden sm:block">MINUTOS</span>
-          </div>
-        </div>
-
-        {/* SEGUNDOS */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex flex-col items-center justify-center bg-black/40 border-2 border-yellow-500/30 rounded-xl backdrop-blur-sm hover:border-yellow-500/70 hover:scale-105 transition-all duration-300">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold animate-pulse">{timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds}</div>
-          <div className="text-xs text-gray-400">
-            <span className="block sm:hidden">SEG</span>
-            <span className="hidden sm:block">SEGUNDOS</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Sección de descargas */}
-      <div className="flex justify-center items-center gap-4 flex-wrap sm:flex-nowrap z-20 mb-8">
-        {/* App Store */}
-        <div className="flex items-center bg-black/60 hover:bg-black/80 transition-all duration-300 rounded-xl px-4 py-2 border border-yellow-500/40 cursor-pointer hover:border-yellow-500/70 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20">
-          <div className="mr-2">
-            <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-            </svg>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-400">Próximamente</span>
-            <span className="text-sm font-semibold">App Store</span>
-          </div>
-        </div>
-
-        {/* Play Store */}
-        <div className="flex items-center bg-black/60 hover:bg-black/80 transition-all duration-300 rounded-xl px-4 py-2 border border-yellow-500/40 cursor-pointer hover:border-yellow-500/70 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20">
-          <div className="mr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-7 h-7 text-white" fill="currentColor">
-              <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.6 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
-            </svg>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-400">Muy pronto en</span>
-            <span className="text-sm font-semibold">Play Store</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Texto descriptivo */}
-      <div className="mt-8 text-center z-20 max-w-xl">
-        <p className="text-sm text-gray-300">
-          Tekko actúa como un puente entre padres e hijos. Permite a los adultos acompañar de cerca el progreso de sus hijos
-        </p>
       </div>
     </section>
   );

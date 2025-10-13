@@ -10,7 +10,7 @@ const HeroDetailsMobile = () => {
     {
         id: "visual-support",
         title: "Apoyo visual y emocional",
-        description: "Tekko ofrece una interfaz visual amigable para que los niños con autismo puedan navegar con facilidad y se sientan acompañados en cada momento.",
+        description: "Tekko ofrece una interfaz visual amigable para que los niños con TEA puedan navegar con facilidad y se sientan acompañados en cada momento.",
         images: [
         { src: "/img_1.png", alt: "" },
         { src: "/img_2.png", alt: "" },
@@ -104,8 +104,18 @@ const HeroDetailsMobile = () => {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                  <button className="border border-gray-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-300">
-                    Próximamente
+                  <button className="border border-gray-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-300 flex items-center justify-center gap-2 group">
+                    Instalar
+                    <svg
+                      className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
               </div>
