@@ -31,7 +31,7 @@ export default function Footer() {
           <ul className="space-y-2 text-base">
             <li>
               <a
-                href="https://www.yvagacore.tech/"
+                href="https://www.yvagacore.com/"
                 className="hover:text-[#FACC15]"
               >
                 Sobre Nosotros
@@ -39,7 +39,7 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="https://www.yvagacore.tech/"
+                href="https://www.yvagacore.com/"
                 className="hover:text-[#FACC15]"
               >
                 Apoyar

@@ -109,11 +109,11 @@ export default function PrivacyPolicy() {
           <p className="text-gray-300">
             🌐{" "}
             <a
-              href="https://www.yvagacore.tech"
+              href="https://www.yvagacore.com"
               target="_blank"
               className="text-yellow-400 hover:underline"
             >
-              www.yvagacore.tech
+              www.yvagacore.com
             </a>
           </p>
         </div>
