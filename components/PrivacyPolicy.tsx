@@ -5,24 +5,28 @@ export default function PrivacyPolicy() {
   const sections = [
     {
       title: "1. Información que recopilamos",
-      content: "Recopilamos información básica del dispositivo, datos de uso y, en caso de contacto, información de los padres o tutores. Tekko puede ser utilizada por niños bajo la supervisión de adultos. Nunca recopilamos información personal directamente de menores sin consentimiento."
+      content:
+        "Recopilamos información básica del dispositivo, datos de uso y, en caso de contacto, información de los padres o tutores. Tekko puede ser utilizada por niños bajo la supervisión de adultos. Nunca recopilamos información personal directamente de menores sin consentimiento.",
     },
     {
       title: "2. Uso de la información",
-      content: "Utilizamos los datos para mejorar la experiencia de Tekko, mostrar anuncios mediante Google AdMob y analizar métricas con Firebase."
+      content:
+        "Utilizamos los datos para mejorar la experiencia de Tekko, mostrar anuncios mediante Google AdMob y analizar métricas con Firebase.",
     },
     {
       title: "3. Privacidad de menores",
-      content: "Tekko está pensada para ser usada con niños. Requiere la supervisión de padres o tutores y cumple con políticas como COPPA. Si descubrimos que recopilamos datos de un menor sin consentimiento, los eliminaremos de inmediato."
-    }
+      content:
+        "Tekko está pensada para ser usada con niños. Requiere la supervisión de padres o tutores y cumple con políticas como COPPA. Si descubrimos que recopilamos datos de un menor sin consentimiento, los eliminaremos de inmediato.",
+    },
   ];
 
   return (
     <section
       id="privacy-policy"
       className="relative min-h-screen flex flex-col items-center justify-start text-white px-6 pt-36 pb-20 overflow-hidden"
-      style={{ 
-        background: 'linear-gradient(180deg, #3d2f1f 0%, #2a1f15 50%, #1a1410 100%)'
+      style={{
+        background:
+          "linear-gradient(180deg, #3d2f1f 0%, #2a1f15 50%, #1a1410 100%)",
       }}
     >
       {/* Partículas doradas de fondo */}
@@ -32,21 +36,30 @@ export default function PrivacyPolicy() {
             key={i}
             className="absolute rounded-full bg-[#F2D19E]"
             style={{
-              width: Math.random() * 4 + 2 + 'px',
-              height: Math.random() * 4 + 2 + 'px',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
+              width: Math.random() * 4 + 2 + "px",
+              height: Math.random() * 4 + 2 + "px",
+              left: Math.random() * 100 + "%",
+              top: Math.random() * 100 + "%",
               opacity: Math.random() * 0.5 + 0.2,
-              animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`,
-              animationDelay: Math.random() * 2 + 's'
+              animation: `twinkle ${
+                Math.random() * 3 + 2
+              }s ease-in-out infinite`,
+              animationDelay: Math.random() * 2 + "s",
             }}
           />
         ))}
       </div>
       <style jsx>{`
         @keyframes twinkle {
-          0%, 100% { opacity: 0.2; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.3); }
+          0%,
+          100% {
+            opacity: 0.2;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.3);
+          }
         }
       `}</style>
 
@@ -97,7 +110,9 @@ export default function PrivacyPolicy() {
             4. Servicios de terceros
           </h2>
           <p className="relative text-gray-300 leading-relaxed mb-4">
-            Tekko utiliza Firebase (analíticas, distribución y notificaciones) y Google AdMob (publicidad). Estos servicios pueden recopilar información anónima de uso. Consulta sus políticas:
+            Tekko utiliza Firebase (analíticas, distribución y notificaciones) y
+            Google AdMob (publicidad). Estos servicios pueden recopilar
+            información anónima de uso. Consulta sus políticas:
           </p>
           <ul className="relative space-y-2">
             <li>
@@ -109,8 +124,18 @@ export default function PrivacyPolicy() {
               >
                 <span className="w-1.5 h-1.5 bg-[#D74B16] rounded-full group-hover/link:scale-150 transition-transform duration-200" />
                 Política de Firebase
-                <svg className="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </a>
             </li>
@@ -123,8 +148,18 @@ export default function PrivacyPolicy() {
               >
                 <span className="w-1.5 h-1.5 bg-[#D74B16] rounded-full group-hover/link:scale-150 transition-transform duration-200" />
                 Política de Google AdMob
-                <svg className="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </a>
             </li>
@@ -144,16 +179,17 @@ export default function PrivacyPolicy() {
             5. Contacto
           </h2>
           <p className="relative text-gray-300 leading-relaxed mb-6">
-            Si tienes dudas o deseas ejercer tus derechos de acceso, rectificación o eliminación de datos, puedes escribirnos:
+            Si tienes dudas o deseas ejercer tus derechos de acceso,
+            rectificación o eliminación de datos, puedes escribirnos:
           </p>
           <div className="relative space-y-3">
             <div className="flex items-center gap-3">
               <span className="text-2xl">📧</span>
               <a
-                href="mailto:team@yvagacore.tech"
+                href="mailto:team@yvagacore.com"
                 className="text-[#F2D19E] hover:text-[#D74B16] transition-colors duration-200 font-medium"
               >
-                team@yvagacore.tech
+                team@yvagacore.com
               </a>
             </div>
             <div className="flex items-center gap-3">
