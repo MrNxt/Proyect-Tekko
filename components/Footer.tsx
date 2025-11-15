@@ -31,10 +31,10 @@ export default function Footer() {
           <ul className="space-y-2 text-base">
             <li>
               <a
-                href="https://www.yvagacore.com/"
+                href="/politicas"
                 className="hover:text-[#FACC15]"
               >
-                Sobre Nosotros
+                Política de Privacidad
               </a>
             </li>
             <li>
