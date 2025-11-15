@@ -3,7 +3,6 @@ import HeroDetails from "@/components/HeroDetails";
 import Footer from "@/components/Footer";
 import Info from "@/components/Info";
 import BetaSignUp from "@/components/BetaSignUp";
-import PrivacyPolicy from "@/components/PrivacyPolicy";
 
 export default function Home() {
   return (
@@ -13,7 +12,6 @@ export default function Home() {
         <Info />
         <HeroDetails />
         <BetaSignUp />
-        <PrivacyPolicy />
       </div>
       <Footer />
     </main>
