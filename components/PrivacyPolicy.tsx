@@ -14,9 +14,19 @@ export default function PrivacyPolicy() {
         "Utilizamos los datos para mejorar la experiencia de Tekko, mostrar anuncios mediante Google AdMob y analizar métricas con Firebase.",
     },
     {
-      title: "3. Privacidad de menores",
+      title: "3. Datos de Google que recopilamos",
       content:
-        "Tekko está pensada para ser usada con niños. Requiere la supervisión de padres o tutores y cumple con políticas como COPPA. Si descubrimos que recopilamos datos de un menor sin consentimiento, los eliminaremos de inmediato.",
+        "Cuando accedes a Tekko mediante Google Sign-In, únicamente obtenemos tu correo electrónico y tu nombre de perfil. No accedemos a tu contraseña ni a información sensible de tu cuenta de Google.",
+    },
+    {
+      title: "4. Cómo usamos los datos de Google",
+      content:
+        "Usamos el correo electrónico y el nombre de perfil solo para autenticar tu cuenta y mostrar tu perfil dentro de la app. No compartimos esta información con terceros ni la usamos para publicidad personalizada.",
+    },
+    {
+      title: "5. Privacidad de menores",
+      content:
+        "Tekko está pensada para ser usada con niños bajo supervisión de padres o tutores. Cumple con políticas como COPPA. Si descubrimos que recopilamos datos de un menor sin consentimiento, los eliminaremos de inmediato.",
     },
   ];
 
@@ -107,7 +117,7 @@ export default function PrivacyPolicy() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#D74B16]/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <h2 className="relative text-2xl font-bold text-[#F2D19E] mb-4 flex items-center gap-3">
             <span className="w-2 h-2 bg-[#D74B16] rounded-full group-hover:scale-150 transition-transform duration-300" />
-            4. Servicios de terceros
+            6. Servicios de terceros
           </h2>
           <p className="relative text-gray-300 leading-relaxed mb-4">
             Tekko utiliza Firebase (analíticas, distribución y notificaciones) y
@@ -176,7 +186,7 @@ export default function PrivacyPolicy() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#D74B16]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <h2 className="relative text-2xl font-bold text-[#F2D19E] mb-4 flex items-center gap-3">
             <span className="w-2 h-2 bg-[#D74B16] rounded-full group-hover:scale-150 transition-transform duration-300" />
-            5. Contacto
+            7. Contacto
           </h2>
           <p className="relative text-gray-300 leading-relaxed mb-6">
             Si tienes dudas o deseas ejercer tus derechos de acceso,
@@ -216,7 +226,7 @@ export default function PrivacyPolicy() {
       >
         <div className="inline-block px-6 py-3 bg-[#F2D19E]/5 backdrop-blur-sm border border-[#D74B16]/20 rounded-full">
           <p className="text-sm text-gray-400">
-            Última actualización: Octubre 2025
+            Última actualización: Noviembre 2025
           </p>
         </div>
       </motion.div>
