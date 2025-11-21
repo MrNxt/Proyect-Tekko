@@ -2,6 +2,9 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { getCookie } from "@/hooks/getCookies";
+import { UploadButton } from "@/hooks/uploadthing";
+import { useUploadThing } from "@/hooks/uploadthingClient";
+import Image from "next/image";
 
 export default function AdminUploadBook() {
   const [titulo, setTitulo] = useState("");
@@ -9,13 +12,15 @@ export default function AdminUploadBook() {
   const [totalPaginas, setTotalPaginas] = useState("");
   const [nivelId, setNivelId] = useState("");
   const pdfRef = useRef<HTMLInputElement | null>(null);
-  const portadaRef = useRef<HTMLInputElement | null>(null);
 
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [portadaFile, setPortadaFile] = useState<File | null>(null);
+  const [portadaUrl, setPortadaUrl] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const { startUpload } = useUploadThing("portadaUploader");
+  const [uploading, setUploading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +32,7 @@ export default function AdminUploadBook() {
       return;
     }
 
-    if (!pdfFile || !portadaFile) {
+    if (!pdfFile || portadaUrl == "") {
       setMessage("Debes seleccionar PDF y portada");
       return;
     }
@@ -38,7 +43,7 @@ export default function AdminUploadBook() {
     formData.append("totalPaginas", totalPaginas);
     formData.append("nivelId", nivelId);
     formData.append("pdf", pdfFile);
-    formData.append("portada", portadaFile);
+    formData.append("portadaFileLink", portadaUrl);
 
     setLoading(true);
     setMessage("");
@@ -83,9 +88,8 @@ export default function AdminUploadBook() {
         setNivelId("");
 
         setPdfFile(null);
-        setPortadaFile(null);
+        setPortadaUrl("");
         if (pdfRef.current) pdfRef.current.value = "";
-        if (portadaRef.current) portadaRef.current.value = "";
       } else {
         setMessage(data.error || "Error subiendo libro");
       }
@@ -203,17 +207,78 @@ export default function AdminUploadBook() {
             required
           />
 
+          {/* Portada */}
           <label className="text-[#F2D19E] font-medium">
             🖼️ Portada (PNG/JPG)
           </label>
-          <input
-            ref={portadaRef}
-            type="file"
-            accept="image/png, image/jpeg"
-            onChange={(e) => setPortadaFile(e.target.files?.[0] || null)}
-            className="text-gray-300"
-            required
-          />
+
+          <div className="flex flex-col gap-4">
+            {/* Preview */}
+            {portadaUrl && (
+              <div className="w-full flex justify-center">
+                <Image
+                  src={portadaUrl}
+                  alt="Preview portada"
+                  width={180}
+                  height={260}
+                  className="object-cover rounded-xl border border-[#D74B16]/40 shadow-md"
+                />
+              </div>
+            )}
+
+            {/* Dropzone-like button */}
+            <div
+              onClick={() =>
+                document.getElementById("uploadthing-input")?.click()
+              }
+              className="border-2 border-dashed border-[#D74B16]/40 hover:border-[#D74B16] 
+              rounded-xl p-6 cursor-pointer flex flex-col items-center justify-center 
+              text-[#F2D19E] transition-all duration-300 hover:bg-[#D74B16]/10"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-10 w-10 mb-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3 16l4-4 4 4 4-4 4 4M4 4h16v12H4z"
+                />
+              </svg>
+
+              <p className="font-semibold text-lg">
+                {uploading ? "Subiendo imagen..." : "Seleccionar portada"}
+              </p>
+              <p className="text-sm text-[#F2D19E]/60 mt-1">
+                PNG, JPG — máximo recomendado 5MB
+              </p>
+            </div>
+
+            {/* Hidden input */}
+            <input
+              id="uploadthing-input"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setUploading(true);
+                try {
+                  const uploaded = await startUpload([file]);
+                  if (uploaded && uploaded[0]?.ufsUrl) {
+                    setPortadaUrl(uploaded[0].ufsUrl);
+                  }
+                } finally {
+                  setUploading(false);
+                }
+              }}
+            />
+          </div>
         </div>
 
         {/* Botón */}
