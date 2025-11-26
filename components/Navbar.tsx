@@ -12,6 +12,7 @@ const sections = [
   { id: "visual-support", label: "Explora", type: "section" },
   { id: "beta-signup", label: "Sugerencias", type: "section" },
   { id: "/politicas", label: "Política de Privacidad", type: "page" },
+  // { id: "/biblioteca", label: "Biblioteca", type: "page" },
 ];
 
 const Navbar = () => {
@@ -39,40 +40,42 @@ const Navbar = () => {
 
   const handleScrollTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     if (pathname !== "/") {
       window.location.href = `/#${id}`;
       return;
     }
-    
+
     const el = document.getElementById(id);
     if (el) {
       const navbarHeight = 100;
-      const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+      const elementPosition =
+        el.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - navbarHeight;
-      
+
       const startPosition = window.pageYOffset;
       const distance = offsetPosition - startPosition;
-      const duration = 800; 
-      
+      const duration = 800;
+
       let startTime: number | null = null;
-      
+
       const animation = (currentTime: number) => {
         if (startTime === null) startTime = currentTime;
         const timeElapsed = currentTime - startTime;
         const progress = Math.min(timeElapsed / duration, 1);
-        
-        const ease = progress < 0.5
-          ? 2 * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-        
+
+        const ease =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
         window.scrollTo(0, startPosition + distance * ease);
-        
+
         if (progress < 1) {
           requestAnimationFrame(animation);
         }
       };
-      
+
       requestAnimationFrame(animation);
       setMenuOpen(false);
     }
@@ -148,7 +151,7 @@ const Navbar = () => {
             className="fixed top-24 right-4 z-40 md:hidden bg-[rgb(9_9_6_/_0.67)] backdrop-blur-md rounded-xl px-5 py-5 text-[#F2D19E] text-base font-medium shadow-lg w-64"
           >
             <div className="flex flex-col space-y-4">
-              {sections.map((section, index) => (
+              {sections.map((section, index) =>
                 section.type === "page" ? (
                   <motion.div
                     key={section.id}
@@ -177,7 +180,7 @@ const Navbar = () => {
                     {section.label}
                   </motion.a>
                 )
-              ))}
+              )}
             </div>
           </motion.div>
         )}
