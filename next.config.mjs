@@ -4,14 +4,19 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.ufs.sh",
+        hostname: "**.ufs.sh",
       },
       {
         protocol: "https",
         hostname: "utfs.io",
+      },
+      {
+        protocol: "https",
+        hostname: "**.uploadthing.com",
       },
     ],
   },
 };
 
 export default nextConfig;
+
