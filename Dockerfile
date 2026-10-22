@@ -52,4 +52,3 @@ RUN npm install sharp
 
 EXPOSE 3004
 CMD ["npm", "start"]
-
