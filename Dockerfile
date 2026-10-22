@@ -1,5 +1,5 @@
-# Etapa 1: Build
-FROM node:18 AS builder
+﻿# Etapa 1: Build (Node >= 22.23.4 patched for CVE-2026-111497)
+FROM node:22.23.4 AS builder
 
 WORKDIR /app
 
@@ -10,8 +10,8 @@ COPY . .
 
 RUN npm run build
 
-# Etapa 2: Producción
-FROM node:18-alpine AS runner
+# Etapa 2: Producción (Node >= 22.23.4 patched for CVE-2026-111497)
+FROM node:22.23.4-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
@@ -32,4 +32,3 @@ RUN npm install sharp
 
 EXPOSE 3004
 CMD ["npm", "start"]
-
