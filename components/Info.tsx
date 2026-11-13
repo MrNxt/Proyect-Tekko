@@ -1,8 +1,7 @@
 "use client"
 import CheesecakeModel from "@/components/Loading/CheesecakeModel"
 import { useEffect, useRef } from "react"
-import Lenis from "@studio-freight/lenis"
-import { motion, useAnimation } from "framer-motion"
+import { m, useAnimation } from "framer-motion"
 
 const FadeIn = ({ children }: { children: React.ReactNode }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -27,39 +26,21 @@ const FadeIn = ({ children }: { children: React.ReactNode }) => {
   }, [controls])
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
       animate={controls}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
 const Info = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const lenisRef = useRef<Lenis | null>(null)
 
-  // Configuración Lenis
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      smoothWheel: true,
-    })
-    lenisRef.current = lenis
-
-    const raf = (time: number) => {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-    requestAnimationFrame(raf)
-
-    return () => {
-      lenis.destroy()
-    }
-  }, [])
+  // El smooth scroll (Lenis) vive en <SmoothScroll /> (app/page.tsx)
 
   useEffect(() => {
     if (!canvasRef.current) return

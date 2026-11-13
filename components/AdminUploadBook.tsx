@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { getCookie } from "@/hooks/getCookies";
 import { UploadButton } from "@/hooks/uploadthing";
 import { useUploadThing } from "@/hooks/uploadthingClient";

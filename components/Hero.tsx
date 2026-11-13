@@ -2,18 +2,22 @@
 import { useCallback, useMemo } from "react";
 import Image from "next/image";
 import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
+// loadSlim incluye todo lo que usa esta config (links, move, circle, density)
+// y pesa bastante menos que loadFull
+import { loadSlim } from "tsparticles-slim";
 import type { Engine } from "tsparticles-engine";
-import { motion } from "framer-motion";
 
 const HeroBody = () => {
   const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
+    await loadSlim(engine);
   }, []);
 
   const particlesOptions = useMemo(
     () => ({
       fullScreen: false,
+      fpsLimit: 60,
+      pauseOnBlur: true,
+      pauseOnOutsideViewport: true,
       background: { color: "#2e1f16" },
       particles: {
         color: { value: "#f7f400" },
@@ -41,19 +45,18 @@ const HeroBody = () => {
       />
 
       {/* Luces difusas */}
-      <div className="absolute -top-32 left-[-15%] w-[500px] h-[500px] bg-yellow-500 opacity-30 rounded-full blur-3xl z-0 animate-pulse-slow" />
-      <div className="absolute bottom-0 right-[-10%] w-[400px] h-[400px] bg-orange-400 opacity-20 rounded-full blur-3xl z-0 animate-pulse-medium" />
-      <div className="absolute top-1/2 left-[10%] w-[300px] h-[300px] bg-yellow-500 opacity-15 rounded-full blur-3xl z-0 animate-pulse-fast" />
+      {/* will-change: el blur se rasteriza una sola vez en su propia capa y no se recalcula cada frame de las partículas */}
+      <div className="absolute -top-32 left-[-15%] w-[500px] h-[500px] bg-yellow-500 opacity-30 rounded-full blur-3xl z-0 animate-pulse-slow will-change-transform" />
+      <div className="absolute bottom-0 right-[-10%] w-[400px] h-[400px] bg-orange-400 opacity-20 rounded-full blur-3xl z-0 animate-pulse-medium will-change-transform" />
+      <div className="absolute top-1/2 left-[10%] w-[300px] h-[300px] bg-yellow-500 opacity-15 rounded-full blur-3xl z-0 animate-pulse-fast will-change-transform" />
 
       {/* Contenedor principal */}
       <div className="relative z-10 w-full max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         {/* Columna izquierda - Contenido de texto */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          className="text-left space-y-6"
-        >
+        {/* Animaciones de entrada en CSS (globals.css): mismas duraciones/retrasos/curva
+            que con framer-motion, pero empiezan en el primer pintado sin esperar al JS
+            → el LCP (título/texto/imagen) aparece mucho antes */}
+        <div className="hero-in-left text-left space-y-6">
           {/* Título principal */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-center md:text-left">
             Aprendemos <span className="text-yellow-400"> y Crecemos</span>{" "}
@@ -70,14 +73,11 @@ const HeroBody = () => {
           {/* Botones de descarga */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-start gap-4 pt-4">
             {/* Botón Play Store */}
-            <motion.a
+            <a
               href="https://play.google.com/store/apps/details?id=com.yvagacore.tekko"
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="group flex items-center gap-3 px-6 py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full font-bold text-lg shadow-xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 w-fit"
+              className="hero-in-btn-1 group flex items-center gap-3 px-6 py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full font-bold text-lg shadow-xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 w-fit"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -101,29 +101,23 @@ const HeroBody = () => {
                   d="M13 7l5 5m0 0l-5 5m5-5H6"
                 />
               </svg>
-            </motion.a>
+            </a>
 
             {/* Botón App Store - Próximamente */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex items-center gap-3 px-6 py-4 bg-black/40 border-2 border-yellow-500/40 text-white rounded-full font-semibold text-lg backdrop-blur-sm cursor-not-allowed w-fit"
+            <div
+              className="hero-in-btn-2 flex items-center gap-3 px-6 py-4 bg-black/40 border-2 border-yellow-500/40 text-white rounded-full font-semibold text-lg backdrop-blur-sm cursor-not-allowed w-fit"
             >
               <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
               </svg>
               <span className="text-gray-400">Próximamente</span>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Columna derecha - Tarjetas flotantes */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="relative flex items-center justify-center lg:justify-end px-4 sm:px-0"
+        <div
+          className="hero-in-right relative flex items-center justify-center lg:justify-end px-4 sm:px-0"
         >
           {/* Contenedor mobiles */}
           <div className="relative w-[280px] h-[560px] sm:w-[320px] sm:h-[640px] lg:w-[360px] lg:h-[720px]">
@@ -135,18 +129,14 @@ const HeroBody = () => {
                   alt="Tekko App Interface"
                   width={260}
                   height={520}
+                  priority
                   className="w-full h-full object-contain"
                 />
               </div>
             </div>
 
             {/* Img 4 - Izquierda superior */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="hidden sm:block absolute -left-16 top-8 w-36 h-auto z-10"
-            >
+            <div className="hero-in-img-1 hidden sm:block absolute -left-16 top-8 w-36 h-auto z-10">
               <Image
                 src="/img_4.png"
                 alt="Tekko Screen"
@@ -154,15 +144,10 @@ const HeroBody = () => {
                 height={280}
                 className="w-full h-auto object-contain drop-shadow-2xl"
               />
-            </motion.div>
+            </div>
 
             {/* Img 5 - Derecha inferior */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-              className="hidden sm:block absolute -right-16 bottom-20 w-32 h-auto z-10"
-            >
+            <div className="hero-in-img-2 hidden sm:block absolute -right-16 bottom-20 w-32 h-auto z-10">
               <Image
                 src="/img_5.png"
                 alt="Tekko Screen"
@@ -170,10 +155,10 @@ const HeroBody = () => {
                 height={256}
                 className="w-full h-auto object-contain drop-shadow-2xl"
               />
-            </motion.div>
+            </div>
 
-            {/* Tarjetas flotantes */}
-            <motion.div className="absolute right-0 sm:-right-4 top-4 w-32 h-24 z-30 animate-float-right">
+            {/* Tarjetas flotantes (animación CSS, no necesitan framer-motion) */}
+            <div className="absolute right-0 sm:-right-4 top-4 w-32 h-24 z-30 animate-float-right">
               <div className="w-full h-full rounded-xl shadow-2xl overflow-hidden border-2 border-yellow-500/30 bg-gradient-to-br from-orange-600 to-yellow-600 p-2">
                 <Image
                   src="/tekko4.png"
@@ -183,9 +168,9 @@ const HeroBody = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className="absolute left-0 sm:-left-6 bottom-16 w-32 h-24 z-30 animate-float-left">
+            <div className="absolute left-0 sm:-left-6 bottom-16 w-32 h-24 z-30 animate-float-left">
               <div className="w-full h-full rounded-xl shadow-2xl overflow-hidden border-2 border-yellow-500/30 bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 p-2">
                 <Image
                   src="/tekko3.png"
@@ -195,36 +180,15 @@ const HeroBody = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-            </motion.div>
+            </div>
 
-            {/* Elementos decorativos flotantes */}
-            <motion.div
-              animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-4 right-12 w-12 h-12 bg-yellow-400 rounded-full opacity-80 blur-sm z-5"
-            />
-            <motion.div
-              animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1,
-              }}
-              className="absolute bottom-12 left-0 sm:-left-6 w-16 h-16 bg-orange-400 rounded-full opacity-60 blur-sm z-5"
-            />
-            <motion.div
-              animate={{ y: [0, -15, 0], scale: [1, 1.1, 1] }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5,
-              }}
-              className="absolute top-1/3 right-0 sm:-right-4 w-8 h-8 bg-yellow-500 rounded-full opacity-70 blur-sm z-5"
-            />
+            {/* Elementos decorativos flotantes: mismas curvas/duraciones que antes,
+                ahora como keyframes CSS (globals.css) que corren fuera del hilo principal */}
+            <div className="hero-orb-a absolute -top-4 right-12 w-12 h-12 bg-yellow-400 rounded-full opacity-80 blur-sm z-5" />
+            <div className="hero-orb-b absolute bottom-12 left-0 sm:-left-6 w-16 h-16 bg-orange-400 rounded-full opacity-60 blur-sm z-5" />
+            <div className="hero-orb-c absolute top-1/3 right-0 sm:-right-4 w-8 h-8 bg-yellow-500 rounded-full opacity-70 blur-sm z-5" />
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

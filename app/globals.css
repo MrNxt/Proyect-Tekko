@@ -28,6 +28,76 @@ body{
     scroll-behavior: smooth;
   }
 
+  /* Lenis: mientras está activo, el scroll-behavior nativo tiene que ser "auto"
+     (si no, cada frame de Lenis/GSAP dispara un smooth-scroll nativo y el scroll da tirones) */
+  html.lenis {
+    scroll-behavior: auto !important;
+  }
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+
+  /* Modelo 3D: OrbitControls pone touch-action:none y bloquea el scroll vertical
+     en móvil al tocar el modelo. Con pan-y se puede scrollear y girar en horizontal. */
+  .model-canvas,
+  .model-canvas * {
+    touch-action: pan-y !important;
+  }
+
+  /* Decorativos flotantes del Hero (antes framer-motion en JS; ahora en el compositor) */
+  @keyframes hero-orb-a {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+  }
+  @keyframes hero-orb-b {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(10px) rotate(-5deg); }
+  }
+  @keyframes hero-orb-c {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.1); }
+  }
+  .hero-orb-a { animation: hero-orb-a 3s ease-in-out infinite; }
+  .hero-orb-b { animation: hero-orb-b 4s ease-in-out 1s infinite; }
+  .hero-orb-c { animation: hero-orb-c 5s ease-in-out 0.5s infinite; }
+
+  /* Entrada del Hero (antes framer-motion: initial/animate/transition).
+     ease-in-out == easeInOut de framer (cubic-bezier(.42,0,.58,1)).
+     fill-mode "both": oculto durante el delay y queda en el estado final,
+     igual que el style inline que dejaba framer. */
+  @keyframes hero-in-from-left {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes hero-in-from-right {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes hero-in-from-below {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes hero-in-from-above {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: none; }
+  }
+  .hero-in-left  { animation: hero-in-from-left 1s ease-in-out both; }
+  .hero-in-right { animation: hero-in-from-right 1s ease-in-out 0.2s both; }
+  .hero-in-btn-1 { animation: hero-in-from-below 0.6s ease-in-out 0.3s both; }
+  .hero-in-btn-2 { animation: hero-in-from-below 0.6s ease-in-out 0.4s both; }
+  .hero-in-img-1 { animation: hero-in-from-below 0.8s ease-in-out 0.5s both; }
+  .hero-in-img-2 { animation: hero-in-from-above 0.8s ease-in-out 0.7s both; }
+
   canvas {
     width: 100% !important;
     height: 100% !important;
