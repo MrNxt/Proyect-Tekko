@@ -1,20 +1,22 @@
-import { useEffect } from 'react';
-import Lenis from 'lenis'
+import { useEffect } from "react";
+import Lenis from "lenis";
+import { setLenis } from "@/lib/lenis";
 
+/**
+ * Smooth scroll con Lenis. Un solo loop de requestAnimationFrame (autoRaf)
+ * que se detiene al desmontar.
+ */
 export const useLenis = () => {
   useEffect(() => {
     const lenis = new Lenis({
-     autoRaf: true,
+      duration: 1.2,
+      smoothWheel: true,
+      autoRaf: true,
     });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
+    setLenis(lenis);
 
     return () => {
+      setLenis(null);
       lenis.destroy();
     };
   }, []);

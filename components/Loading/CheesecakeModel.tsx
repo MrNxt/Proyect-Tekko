@@ -1,39 +1,73 @@
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, useGLTF } from '@react-three/drei'
-import { Suspense, useEffect, useRef, useState } from 'react'
-import { Group } from 'three'
+"use client"
+import dynamic from 'next/dynamic'
+import { useEffect, useRef, useState } from 'react'
 
-function Model() {
-  const gltf = useGLTF('/models/shiba_inu_astronaut.glb')
-  const ref = useRef<Group>(null)
-
-  const [scale, setScale] = useState(2.5)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setScale(window.innerWidth < 640 ? 1.9 : 2.5) 
-    }
-
-    handleResize() 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  useFrame(() => {
-    if (ref.current) {
-      ref.current.rotation.y += 0.005
-      ref.current.position.y = Math.sin(Date.now() * 0.001) * 0.1
-    }
-  })
-
-  return <primitive ref={ref} object={gltf.scene} scale={scale} />
-}
-
-useGLTF.preload('/models/shiba_inu_astronaut.glb')
+// three.js + drei + fiber (~700 KB) solo se descargan cuando el modelo se acerca a la pantalla
+const ModelScene = dynamic(() => import('./ModelScene'), { ssr: false })
 
 export default function CheesecakeModel() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isNear, setIsNear] = useState(false)
+  const [pageIdle, setPageIdle] = useState(false)
+  const [inView, setInView] = useState(false)
+
+  // three.js + el .glb (~1.5 MB en total) no deben competir con la carga inicial
+  // (Hero, fuente, imagen principal): se espera a que la página termine de cargar
+  // y el navegador esté libre.
+  useEffect(() => {
+    let idleId: number | undefined
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    const markIdle = () => {
+      if ('requestIdleCallback' in window) {
+        idleId = window.requestIdleCallback(() => setPageIdle(true), { timeout: 2000 })
+      } else {
+        timeoutId = setTimeout(() => setPageIdle(true), 200)
+      }
+    }
+    if (document.readyState === 'complete') markIdle()
+    else window.addEventListener('load', markIdle, { once: true })
+
+    return () => {
+      window.removeEventListener('load', markIdle)
+      if (idleId !== undefined) window.cancelIdleCallback(idleId)
+      if (timeoutId !== undefined) clearTimeout(timeoutId)
+    }
+  }, [])
+
+  const shouldMount = isNear && pageIdle
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    // Precarga con margen amplio para que el modelo ya esté listo al llegar
+    const mountObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsNear(true)
+          mountObserver.disconnect()
+        }
+      },
+      { rootMargin: '600px 0px' }
+    )
+
+    // Render activo solo mientras se ve (con un pequeño margen)
+    const viewObserver = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '100px 0px' }
+    )
+
+    mountObserver.observe(el)
+    viewObserver.observe(el)
+    return () => {
+      mountObserver.disconnect()
+      viewObserver.disconnect()
+    }
+  }, [])
+
   return (
     <div
+      ref={containerRef}
       style={{
         display: 'flex',
         justifyContent: 'center',
@@ -44,14 +78,7 @@ export default function CheesecakeModel() {
         padding: '20px',
       }}
     >
-      <Canvas camera={{ position: [0, 1, 3] }} style={{ width: '100%', height: '100%' }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[2, 5, 2]} intensity={1.2} />
-        <Suspense fallback={null}>
-          <Model />
-        </Suspense>
-        <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1} />
-      </Canvas>
+      {shouldMount && <ModelScene active={inView} />}
     </div>
   )
 }

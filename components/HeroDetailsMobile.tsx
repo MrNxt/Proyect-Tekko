@@ -1,11 +1,9 @@
 "use client"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import React, { useState, useEffect, useMemo } from "react"
+import { m as motion } from "framer-motion"
+import React, { useMemo } from "react"
 
 const HeroDetailsMobile = () => {
-  const [activeSection, setActiveSection] = useState(0);
-  
   const sections = useMemo(() => [
     {
         id: "visual-support",
@@ -39,25 +37,8 @@ const HeroDetailsMobile = () => {
     }
     ], []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      
-      sections.forEach((section, index) => {
-        const element = document.getElementById(section.id);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
-            setActiveSection(index);
-          }
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [sections]);
+  // (Se quitó un listener de scroll que medía el layout y re-renderizaba en cada
+  // evento para guardar un "activeSection" que nunca se usaba en el render.)
 
   const goToSection = (index: number) => {
     const sectionEl = document.getElementById(sections[index].id);

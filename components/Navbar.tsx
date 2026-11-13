@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getLenis, easeInOutQuad } from "@/lib/lenis";
 
 const sections = [
   { id: "inicio", label: "Inicio", type: "section" },
@@ -17,7 +18,9 @@ const sections = [
 
 const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  // Ref en vez de state: antes cada evento de scroll re-renderizaba el Navbar
+  // y re-registraba el listener
+  const lastScrollY = useRef(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -25,18 +28,18 @@ const Navbar = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
         setIsVisible(false);
-      } else if (currentScrollY < lastScrollY || currentScrollY < 10) {
+      } else if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
         setIsVisible(true);
       }
 
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleScrollTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -52,6 +55,15 @@ const Navbar = () => {
       const elementPosition =
         el.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - navbarHeight;
+
+      // Con Lenis activo, el scroll lo hace Lenis (misma duración y curva)
+      // para no pelear con su animación
+      const lenis = getLenis();
+      if (lenis) {
+        lenis.scrollTo(offsetPosition, { duration: 0.8, easing: easeInOutQuad });
+        setMenuOpen(false);
+        return;
+      }
 
       const startPosition = window.pageYOffset;
       const distance = offsetPosition - startPosition;

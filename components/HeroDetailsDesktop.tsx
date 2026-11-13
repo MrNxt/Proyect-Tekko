@@ -3,6 +3,7 @@ import React, { useRef, useLayoutEffect, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { getLenis, subscribeLenis, easeInOutQuad } from "@/lib/lenis";
 
 // GSAP
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -27,7 +28,6 @@ const debounce = <T extends (...args: any[]) => void>(func: T, wait: number) => 
 
 const HeroDetailsDesktopComponent = () => {
   const [activeSection, setActiveSection] = useState<number>(0);
-  const [isIndicatorsVisible, setIsIndicatorsVisible] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const panelsRef = useRef<(HTMLDivElement | null)[]>([]);
   const scrollTweenRef = useRef<GSAPTween | null>(null);
@@ -78,6 +78,20 @@ const HeroDetailsDesktopComponent = () => {
     []
   );
 
+  // Sincroniza ScrollTrigger con Lenis: se actualiza en el mismo frame en que
+  // Lenis mueve el scroll (evita el temblor del pin con smooth scroll)
+  useLayoutEffect(() => {
+    let off: (() => void) | undefined;
+    const unsubscribe = subscribeLenis((lenis) => {
+      off?.();
+      off = lenis?.on("scroll", ScrollTrigger.update);
+    });
+    return () => {
+      unsubscribe();
+      off?.();
+    };
+  }, []);
+
   useLayoutEffect(() => {
     if (!containerRef.current) return;
 
@@ -87,6 +101,8 @@ const HeroDetailsDesktopComponent = () => {
     // GPU
     container.style.willChange = "transform";
     container.style.transform = "translate3d(0,0,0)";
+    // Los paneles son los que se desplazan: capa propia permanente
+    panels.forEach((p) => (p.style.willChange = "transform"));
 
     const activeRef = { current: -1 };
 
@@ -134,7 +150,6 @@ const HeroDetailsDesktopComponent = () => {
           duration: 0.25,
           ease: "power2.out",
         });
-        setIsIndicatorsVisible(self.isActive);
       },
     });
 
@@ -145,27 +160,32 @@ const HeroDetailsDesktopComponent = () => {
       indicatorTriggerRef.current?.kill();
       container.style.willChange = "";
       container.style.transform = "";
+      panels.forEach((p) => (p.style.willChange = ""));
     };
   }, [sections.length, handleSectionChange]);
 
   const goToSection = (index: number) => {
     const container = containerRef.current;
     const tween = scrollTweenRef.current;
-    if (!container || !tween) return;
+    const st = tween?.scrollTrigger;
+    if (!container || !tween || !st) return;
 
-    tween.scrollTrigger?.disable();
+    // Posición exacta del panel a partir del inicio del pin. Antes se
+    // deshabilitaba el ScrollTrigger para medir, lo que des-pineaba la sección
+    // y la hacía saltar durante la animación.
+    const targetY = st.start + index * container.offsetWidth;
 
-    const containerStart =
-      container.getBoundingClientRect().top + window.pageYOffset;
-    const targetY = containerStart + index * container.offsetWidth;
+    // Con Lenis activo, el scroll lo hace Lenis (power2.inOut == easeInOutQuad)
+    const lenis = getLenis();
+    if (lenis) {
+      lenis.scrollTo(targetY, { duration: 0.6, easing: easeInOutQuad });
+      return;
+    }
 
     gsap.to(window, {
       scrollTo: targetY,
       duration: 0.6,
       ease: "power2.inOut",
-      onComplete: () => {
-        tween.scrollTrigger?.enable();
-      },
     });
   };
 
@@ -243,6 +263,7 @@ const HeroDetailsDesktopComponent = () => {
                             src={section.images[0].src}
                             alt={section.images[0].alt}
                             fill
+                            sizes="280px"
                             className="object-contain"
                             quality={70}
                             priority={index === 0}
@@ -260,6 +281,7 @@ const HeroDetailsDesktopComponent = () => {
                           src={section.images[1].src}
                           alt={section.images[1].alt}
                           fill
+                          sizes="180px"
                           className="object-contain"
                           quality={50}
                           loading="lazy"
@@ -276,6 +298,7 @@ const HeroDetailsDesktopComponent = () => {
                           src={section.images[2].src}
                           alt={section.images[2].alt}
                           fill
+                          sizes="100px"
                           className="object-contain"
                           quality={50}
                           loading="lazy"
